@@ -1,0 +1,258 @@
+# ==========================================================
+# HCL UnO - PROPRIETARY ORCHESTRATOR (SUPPORTED)
+# ==========================================================
+
+services:
+  hcl-uno-console-aio:
+    depends_on:
+      hcl-uno-automation-plugins:
+        condition: service_completed_successfully
+    image: ${UNO_REGISTRY}/hcl-uno-console-aio:${UNO_VERSION}
+    env_file:
+      - uno.env
+    ports:
+      - 8442:8443
+    container_name: "hcl-uno-console-aio"
+    hostname: hcl-uno-console-aio
+    healthcheck:
+      # Show unhealthy status if the plugin volume is not populated or unaccessible
+      test: ["CMD-SHELL", "if [ $(ls -1 /storage/job-plugins | wc -l) -le 10 ]; then echo 'Required plugins are not populated'; exit 1; fi && curl -k -s -f https://localhost:8443/q/health/live"]
+      start_period: 60s   # ← give the app time to boot before starting health checks
+      interval: 20s
+      timeout: 5s
+      retries: 3
+    volumes:
+      - ./security/certs:/security/certs:z
+      - ./security/ext_agt_depot:/security/ext_agt_depot:z
+      - ./security/jwt:/security/jwt:z
+      - ./engines:/config/engines:z
+      - ./security/agenticbuilder/jwt/jwt.crt:/security/agenticbuilder/jwt/jwt.crt:z
+      - cloud_plugins_data:/storage/job-plugins:z
+    networks:
+      - hcl-uno-ms-network
+
+  hcl-uno-externalpod:
+    image: ${UNO_REGISTRY}/hcl-uno-external-pod:${UNO_VERSION}
+    environment:
+      PACKAGES_URL: ${PACKAGES_URL}
+      LICENSE: ACCEPT
+    ports: # port mapping "external:internal". Internal ports are predefined.
+      - "8450:8080" #HTTPS
+    container_name: "hcl-uno-externalpod"
+    hostname: hcl-uno-externalpod
+    volumes:
+      - ./security/certs:/security/certs:z
+      - ./security/ext_agt_depot:/security/ext_agt_depot:z
+      - ./security/jwt:/security/jwt:z
+    networks:
+      - hcl-uno-ms-network
+
+  hcl-uno-automation-plugins:
+    image: ${UNO_REGISTRY}/hcl-uno-automation-plugins:${UNO_VERSION}
+    environment:
+      LICENSE: ACCEPT
+    ports: # port mapping "external:internal". Internal ports are predefined.
+      - "8460:8080" #HTTPS
+    container_name: "hcl-uno-plugins"
+    hostname: hcl-uno-plugins
+    volumes:
+      - ./security/certs:/security/certs:z
+      - ./security/ext_agt_depot:/security/ext_agt_depot:z
+      - ./security/jwt:/security/jwt:z
+      - cloud_plugins_data:/opt/wa_cloud_plugins:z
+    networks:
+     - hcl-uno-ms-network
+
+  ########### AGENTIC BUILDER SERVICES ###########
+  hcl-uno-agentic-runner-test:
+    image: ${UNO_REGISTRY}/hcl-agentic-runner:${UNO_VERSION}
+    container_name: hcl-uno-agentic-runner-test
+    hostname: hcl-uno-agentic-runner-test
+    profiles:
+      - full
+      - agenticbuilder
+    env_file:
+      - agenticbuilder.env
+    environment:
+      EXECUTOR_NAME: ${UNO_AGENTIC_AI_RUNNER_TEST_EXECUTOR_NAME}
+      EXECUTOR_PREFIX_KEY: ${UNO_AGENTIC_AI_RUNNER_TEST_EXECUTOR_PREFIX_KEY}
+    #To Start Uvicorn server with HTTPS
+    command:
+      - --ssl-keyfile
+      - /https/tls.key
+      - --ssl-certfile
+      - /https/tls.crt
+    networks:
+      - hcl-uno-ms-network
+    volumes:
+      - ./security/agenticbuilder/:/https:z
+      - ./security/agenticbuilder/jwt:/agenticbuilder/jwt:ro,z
+      - ./security/agenticbuilder/ca.crt:/ca/ca.crt:z
+      - ./security/jwt/tls.crt:/jwt/tls.crt:ro,z
+      - ./security/agenticbuilder/jwt/jwt.crt:/security/agenticbuilder/jwt.crt:z
+
+  hcl-uno-agentic-runner-prod:
+    image: ${UNO_REGISTRY}/hcl-agentic-runner:${UNO_VERSION}
+    container_name: hcl-uno-agentic-runner-prod
+    hostname: hcl-uno-agentic-runner-prod
+    profiles:
+      - full
+      - agenticbuilder
+    env_file:
+      - agenticbuilder.env
+    environment:
+      EXECUTOR_NAME: ${UNO_AGENTIC_AI_RUNNER_PROD_EXECUTOR_NAME}
+      EXECUTOR_PREFIX_KEY: ${UNO_AGENTIC_AI_RUNNER_PROD_EXECUTOR_PREFIX_KEY}
+    #To Start Uvicorn server with HTTPS
+    command:
+      - --ssl-keyfile
+      - /https/tls.key
+      - --ssl-certfile
+      - /https/tls.crt
+    networks:
+      - hcl-uno-ms-network
+    volumes:
+      - ./security/agenticbuilder/:/https:z
+      - ./security/agenticbuilder/jwt:/agenticbuilder/jwt:ro,z
+      - ./security/agenticbuilder/ca.crt:/ca/ca.crt:z
+      - ./security/jwt/tls.crt:/jwt/tls.crt:ro,z
+      - ./security/agenticbuilder/jwt/jwt.crt:/security/agenticbuilder/jwt.crt:z
+
+  hcl-uno-agentic-cm:
+    image: ${UNO_REGISTRY}/hcl-agentic-cm:${UNO_VERSION}
+    container_name: hcl-uno-agentic-cm
+    hostname: hcl-uno-agentic-cm
+    profiles:
+      - full
+      - agenticbuilder
+    restart: always
+    env_file:
+      - agenticbuilder.env
+    #To Start Uvicorn server with HTTPS
+    command:
+      - --ssl-keyfile
+      - /https/tls.key
+      - --ssl-certfile
+      - /https/tls.crt
+    networks:
+      - hcl-uno-ms-network
+    volumes:
+      - ./security/agenticbuilder/:/https:z
+      - ./security/agenticbuilder/jwt:/agenticbuilder/jwt:ro,z
+      - ./security/agenticbuilder/ca.crt:/ca/ca.crt:z
+      - ./security/jwt/tls.crt:/jwt/tls.crt:ro,z
+      - ./security/agenticbuilder/jwt/jwt.crt:/security/agenticbuilder/jwt.crt:z
+
+  hcl-uno-agentic-ams:
+    image: ${UNO_REGISTRY}/hcl-agentic-ams:${UNO_VERSION}
+    container_name: hcl-uno-agentic-ams
+    hostname: hcl-uno-agentic-ams
+    restart: always
+    profiles:
+      - full
+      - agenticbuilder
+    env_file:
+      - agenticbuilder.env
+    #To Start Uvicorn server with HTTPS
+    command:
+      - --ssl-keyfile
+      - /https/tls.key
+      - --ssl-certfile
+      - /https/tls.crt
+    ports:
+      - "8000:8080"
+    volumes:
+      - ./security/agenticbuilder/:/https:z
+      - ./security/agenticbuilder/jwt:/agenticbuilder/jwt:ro,z
+      - ./security/agenticbuilder/ca.crt:/ca/ca.crt:z
+      - ./security/jwt/tls.crt:/jwt/tls.crt:ro,z
+      - ./security/agenticbuilder/jwt/jwt.crt:/security/agenticbuilder/jwt.crt:z
+    networks:
+      - hcl-uno-ms-network
+
+  ### AI Pilot Services ###
+  hcl-uno-pilot-core:
+    container_name: "hcl-uno-pilot-core"
+    hostname: hcl-uno-pilot-core
+    image: ${UNO_REGISTRY}/hcl-aipilot-core:${UNO_VERSION}
+    user: "1001:1001"
+    profiles:
+      - full
+      - aipilot
+    restart: unless-stopped
+    env_file:
+      - pilot.env
+    environment:
+      POSTGRES_USER: ${UNO_PILOT_PGUSER}
+      POSTGRES_DB: ${UNO_PILOT_DB}
+    networks:
+      - hcl-uno-ms-network
+    command: /bin/bash -c "if [ ! -f /app/models/MODEL.tar.gz ]; then rasa train --fixed-model-name MODEL.tar.gz; fi; rasa run --ssl-certificate /security/certs/tls.crt --ssl-keyfile /security/certs/tls.key --cors '*' --enable-api"
+    volumes:
+      - /app/models
+      - /app/roberta-base
+      - /app/.rasa
+      - ./security/pilot/:/security/certs:z
+      - ./security/jwt/:/jwt/:ro,z
+  hcl-uno-pilot-actions:
+    container_name: "hcl-uno-pilot-actions"
+    hostname: hcl-uno-pilot-actions
+    image: ${UNO_REGISTRY}/hcl-aipilot-core:${UNO_VERSION}
+    user: "1001:1001"
+    profiles:
+      - full
+      - aipilot
+    env_file:
+      - pilot.env
+    restart: unless-stopped
+    networks:
+      - hcl-uno-ms-network
+    command:  /bin/bash -c "rasa run actions --ssl-certificate /security/certs/tls.crt --ssl-keyfile /security/certs/tls.key"
+    volumes:
+      - ./security/pilot/:/security/certs:z
+      - ./security/jwt/:/jwt/:ro,z
+  hcl-uno-pilot-nlg:
+    container_name: "hcl-uno-pilot-nlg"
+    hostname: hcl-uno-pilot-nlg
+    image: ${UNO_REGISTRY}/hcl-aipilot-core:${UNO_VERSION}
+    user: "1001:1001"
+    profiles:
+      - full
+      - aipilot
+    env_file:
+      - pilot.env
+    restart: unless-stopped
+    networks:
+      - hcl-uno-ms-network
+    command: /bin/bash -c "uvicorn nlg.app:app --ssl-certfile /security/certs/tls.crt --ssl-keyfile /security/certs/tls.key --host=0.0.0.0 --port=5001"
+    volumes:
+      - ./security/pilot/:/security/certs:z
+      - ./security/jwt/tls.crt:/jwt/tls.crt:ro,z
+  hcl-uno-pilot-backend:
+    container_name: "hcl-uno-pilot-backend"
+    hostname: hcl-uno-pilot-backend
+    image: ${UNO_REGISTRY}/hcl-aipilot-backend:${UNO_VERSION}
+    user: "1001:1001"
+    profiles:
+      - full
+      - aipilot
+    restart: unless-stopped
+    env_file:
+      - pilot.env
+    environment:
+      POSTGRES_USER: ${UNO_RAG_PGUSER}
+      POSTGRES_DB: ${UNO_RAG_DB}
+    networks:
+      - hcl-uno-ms-network
+    volumes:
+      - ./security/jwt/tls.crt:/jwt/tls.crt:ro,z
+      - ./security/pilot/:/security/certs:z
+    entrypoint: ["python", "-m","uvicorn", "app:app", "--host","0.0.0.0","--port","9999","--loop","asyncio", "--ssl-keyfile", "/security/certs/tls.key", "--ssl-certfile", "/security/certs/tls.crt"]
+
+networks:
+  hcl-uno-ms-network:
+    external: true
+    name: hcl-uno-ms-network
+
+volumes:
+  cloud_plugins_data:
