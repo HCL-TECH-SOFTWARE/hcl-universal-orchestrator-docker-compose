@@ -1,0 +1,1 @@
+# This file ensures the security folder is included in the zip archive even if empty.
