@@ -101,19 +101,18 @@ that they start:
 | `full` | All services |
 
 
-
 ## Deployment
 
 1. Navigate to the extracted **hcl-uno.zip** file location and then open the **main.env** file.
 2. Run the following command to log in to the HCL harbor.
 
  **Docker**:
-
- `docker login hclcr.io`
+ 
+    docker login hclcr.io
 
  **Podman**:
-
- `podman login hclcr.io`
+ 
+    podman login hclcr.io
 
 3. Enter your credentials when prompted.
 
@@ -123,11 +122,12 @@ that they start:
 4. **Applicable for Linux / macOS only**
 	
 	Run the following commands to grant permissions to the **scripts** and **security** folders:
-
-	`chmod -R 777 scripts`
-
-	`chmod -R 777 security`
-
+	```
+ 	chnod -R scripts
+	``` 
+    ``` 
+    chmod -R 777 security
+	```
 	Note: This ensures the application can run scripts and generate required directories during deployment.
 
 5. **Applicable for Windows only**
@@ -172,14 +172,14 @@ that they start:
 
 **Docker**:
 
-`
-docker compose --env-file main.env -f docker-compose.yml up -d`
-
+```
+docker compose --env-file main.env -f docker-compose.yml up -d
+```
 **Podman**:
 
-`
-podman compose --env-file main.env -f docker-compose.yml up -d`
-
+```
+podman compose --env-file main.env -f docker-compose.yml up -d
+```
 
 
 **Optional:** 
@@ -190,26 +190,26 @@ To install Agentic AI Builder along with the deployment, run the following comma
 
 **Docker**:
 
-`
-docker compose --env-file main.env --profile agenticbuilder -f docker-compose.yml up -d`
-
+```
+docker compose --env-file main.env --profile agenticbuilder -f docker-compose.yml up -d
+```
 **Podman**:
 
-`
-podman compose --env-file main.env --profile agenticbuilder -f docker-compose.yml up -d`
-
+```
+podman compose --env-file main.env --profile agenticbuilder -f docker-compose.yml up -d
+```
 * Deployment with AI pilot
 
 To install AI pilot along with the deployment, run the following command:
 
-      **Docker**
-
-      `docker-compose --env-file main.env --profile aipilot -f docker-compose.yml up -d`
-
-      **Podman**
-
-      `podman-compose --env-file main.env --profile aipilot -f docker-compose.yml up -d`
-
+**Docker**
+ ```
+  docker-compose --env-file main.env --profile aipilot -f docker-compose.yml up -d
+  ```
+ **Podman**
+  ```
+   podman-compose --env-file main.env --profile aipilot -f docker-compose.yml up -d
+ ```
 
 * Deployment with all services
 
@@ -217,14 +217,14 @@ To install Agentic AI Builder and other services with the deployment, run the fo
 
 **Docker**:
 
-`
-docker compose --env-file main.env --profile full -f docker-compose.yml up -d`
-
+```
+docker compose --env-file main.env --profile full -f docker-compose.yml up -d
+```
 **Podman**:
 
-`
-podman compose --env-file main.env --profile full -f docker-compose.yml up -d`
-
+```
+podman compose --env-file main.env --profile full -f docker-compose.yml up -d
+```
 ### Optional: Deploying in an air-gapped environment
 
 To deploy the HCL Universal Orchestrator instance in an air-gapped environment, you can download the images into a portable archive and load them into a local container registry. After you log in to the HCL public registry, complete the following steps:
@@ -232,25 +232,25 @@ To deploy the HCL Universal Orchestrator instance in an air-gapped environment, 
 1. Run the following command to download the images:
 
 	**Linux / macOS**
-				
-	`chmod +x downloadImages.sh && ./downloadImages.sh`
-		
+	```			
+	chmod +x downloadImages.sh && ./downloadImages.sh
+	```	
 	**Windows**
-				
-	`.\downloadImages.ps1`
-
+	```			
+	.\downloadImages.ps1
+	```
 	This step creates a **services.img** file that contains all the required images. 
 2. Transfer the **services.img** file to your target machine.
 3. Run the following command to load the images into the local container registry:
 				
 	**Linux / macOS**
-	
-	`chmod +x loadImages.sh && ./loadImages.sh`
-
+	```
+	chmod +x loadImages.sh && ./loadImages.sh
+	```
 	**Windows**
-
-	`.\loadImages.ps1`
-
+	```
+	.\loadImages.ps1
+	```
 	After you load the images, proceed with the deployment steps.
 	
 	
@@ -260,17 +260,17 @@ To manually verify the deployment, complete the following check.
 1. Run the following command to list all the containers in your system:
 
 **Docker**:
-
-`docker ps -a`
-
+```
+docker ps -a
+```
 **Podman**:
-
-`podman ps -a`
-
+```
+podman ps -a
+```
 2. Run the following command to ensure the console is booted up successfully.
-
-`curl -k https://localhost:8442/q/health/live`
-
+```
+curl -k https://localhost:8442/q/health/live
+```
 
 ## Exposed ports
 
@@ -299,23 +299,24 @@ The following procedure steps explain how to install the instances on two new se
 
 1. Open the **uno-compose-prerequisites.env** file in the primary server and then update the **KAFKA_ADVERTISED_LISTENERS** attribute to include both the replicas.
 
-    **Example**: 
-    `'SASL_SSL://<Primary_Server_IP_OR_DNS>:9092,PLAINTEXT://<Primary_Server_IP_OR_DNS>:9094'`
-
-2. Open the **generate-certs.sh** script and add the public URL as Subject alternative Name.
-
-    `'SASL_SSL://<Primary_Server_IP_OR_DNS>:9092,PLAINTEXT://<Primary_Server_IP_OR_DNS>:9094'`
-
-3. Run the following command to start the prerequisites:
+    **Example**:
+   ```
+   'SASL_SSL://<Primary_Server_IP_OR_DNS>:9092,PLAINTEXT://<Primary_Server_IP_OR_DNS>:9094'
+    ```
+3. Open the **generate-certs.sh** script and add the public URL as Subject alternative Name.
+	```
+    'SASL_SSL://<Primary_Server_IP_OR_DNS>:9092,PLAINTEXT://<Primary_Server_IP_OR_DNS>:9094'
+	```
+4. Run the following command to start the prerequisites:
 
     **Docker**
-
-    `docker compose --env-file main.env -f uno-compose-prerequisites.yml up -d`
-
+	```
+    docker compose --env-file main.env -f uno-compose-prerequisites.yml up -d
+	```
     **Podman**
-
-    `podman compose --env-file main.env -f uno-compose-prerequisites.yml ps`
-
+	```
+    podman compose --env-file main.env -f uno-compose-prerequisites.yml ps
+	```
 Perform all the following steps in both replicas.
 
 4. Copy the **hcl-uno.zip** file from the primary server to the destination folders on Replica A and Replica B.
@@ -331,13 +332,13 @@ Perform all the following steps in both replicas.
 7. Run the following command to log into the HCL harbor:
 
     **Docker**:
-
-    `docker login hclcr.io`
-
+	```
+    docker login hclcr.io
+	```
     **Podman**:
-
-    `podman login hclcr.io`
-
+	```
+    podman login hclcr.io
+	```
 8. Enter your credentials when prompted:
 
     * Username: The username to access the HCL public registry.
@@ -367,38 +368,40 @@ Perform all the following steps in both replicas.
 11. Create a network to handle the virtual networking between the Docker containers. 
 	
     **Docker**:
-
-	  `docker network create NETWORK_NAME || true`
-	
+	```
+	docker network create NETWORK_NAME || true
+	```
     **Podman**:
-
-    `podman network create NETWORK_NAME || true`
-
+	```
+    podman network create NETWORK_NAME || true
+	```
 12. Navigate to the main directory and run the following command to start the deployment on each replica.
 
     **Docker**:
-
-    `docker compose --env-file main.env -f docker-compose.yml up -d`
-
-    `docker compose --env-file main.env -f docker-compose.yml ps`
-
+	```
+    docker compose --env-file main.env -f docker-compose.yml up -d
+	```
+ 	```
+    docker compose --env-file main.env -f docker-compose.yml ps
+	```
     **Podman**:
-
-    `podman compose --env-file main.env -f docker-compose.yml up -d`
-
-    `podman compose --env-file main.env -f docker-compose.yml ps}`
-
+	```
+    podman compose --env-file main.env -f docker-compose.yml up -d
+	```
+	```
+    podman compose --env-file main.env -f docker-compose.yml ps}
+	```
 
     **Optional**: To install Agentic AI Builder along with the deployment, run the following command:
 
 	   **Docker**:
-
-	  `docker compose --env-file main.env --profile agenticbuilder -f docker-compose.yml up -d`
-
+	  ```
+	  docker compose --env-file main.env --profile agenticbuilder -f docker-compose.yml up -d`
+	  ```
 	  **Podman**:
-
-	  `podman compose --env-file main.env --profile agenticbuilder -f docker-compose.yml up -d`
-
+	  ```
+	  podman compose --env-file main.env --profile agenticbuilder -f docker-compose.yml up -d`
+	  ```
 You have successfully created an active-active setup with two replicas. The load balancer now manages the workload and distributes it among the primary server and the replicas.
 
 
@@ -407,13 +410,13 @@ You have successfully created an active-active setup with two replicas. The load
 The command to stop the HCL Universal Orchestrator instance depends on how it was deployed. If you deployed only the core services, you do not need to specify a compose profile. If you deployed additional services, you must specify the same compose profile that you used during deployment. The following example shows the command to stop and remove an instance with all services by using the `full` compose profile.
 
 **Docker**:
-
-`docker compose --env-file main.env --profile full -f docker-compose.yml down`
-
+```
+docker compose --env-file main.env --profile full -f docker-compose.yml down
+```
 **Podman**:
-
-`podman compose --env-file main.env --profile full -f docker-compose.yml down`
-
+```
+podman compose --env-file main.env --profile full -f docker-compose.yml down
+```
 ---
 
 
