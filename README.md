@@ -46,6 +46,7 @@ The compressed file contains the following files, scripts, and folder:
 
 Before you begin verify that your environment meets the following requirements. Configure the connection details for these services in the `main.env` file.
 
+* Podman: Version 5 or later.
 * Messaging system : Apache Kafka v 3.9 or later OR Redpanda v 25.3 or later. For more information, see [Kafka documentation](https://kafka.apache.org/43/getting-started/) or [Redpanda](https://docs.redpanda.com/agentic-data-plane/home/).
 * Database : MongoDB v 8 or later OR Azure Cosmos DB for MongoDB (vCore) OR AWS DocumentDB v 5 
 	(Note: Support for the DocumentDB platform is strictly limited to Instance-based clusters only). For more information, see [MongoDB documentation](https://www.mongodb.com/docs/) or [Azure Cosmos DB documentation](https://learn.microsoft.com/en-us/azure/cosmos-db/) or [AWS documentation](https://docs.aws.amazon.com/documentdb/).
