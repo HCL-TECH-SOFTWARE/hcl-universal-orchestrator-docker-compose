@@ -17,7 +17,6 @@ This document includes the following topics:
  * [Services overview](#Services-overview)
  * [Compose profiles](#Compose-profiles)
  * [Deployment](#Deployment)
- * [Optional: Deploying in an air gapped environment](#Optional:-Deploying-in-an-air-gapped-environment)
  * [Verifying the deployment](#Verifying-the-deployment)
  * [Exposed ports](#Exposed-ports)
  * [Deploying multiple instances of HCL Universal Orchestrator](#Deploying-multiple-instances-of-HCL-Universal-Orchestrator)
@@ -233,7 +232,7 @@ podman compose --env-file main.env --profile full -f docker-compose.yml up -d
 **Note:** To download and configure orchestration CLI, see [Installing and authenticating the Orchestration CLI](https://help.hcl-software.com/UnO/ContinuousDelivery/Deployment/installingocli.html).
 
 
-### Optional: Deploying in an air gapped environment
+### Optional: Deploying in an air-gapped environment
 
 To deploy the HCL Universal Orchestrator instance in an air-gapped environment, you can download the images into a portable archive and load them into a local container registry. After you log in to the HCL public registry, complete the following steps:
 
