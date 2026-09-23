@@ -229,7 +229,7 @@ podman compose --env-file main.env --profile full -f docker-compose.yml up -d
 
 8. Download and configure the HCL UnO agent. For more information, see [Installing HCL UnO agent](https://help.hcl-software.com/UnO/ContinuousDelivery/Configuring/t_configuring_orchestrationagent.html).
 
-**Note:** To download and configure orchestration CLI, see [Installing and authenticating the Orchestration CLI](https://help.hcl-software.com/UnO/ContinuousDelivery/Deployment/installingocli.html).
+**Note:** To download and configure Orchestration CLI, see [Installing and authenticating the Orchestration CLI](https://help.hcl-software.com/UnO/ContinuousDelivery/Deployment/installingocli.html).
 
 
 ### Optional: Deploying in an air-gapped environment
