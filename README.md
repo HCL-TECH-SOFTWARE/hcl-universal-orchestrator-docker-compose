@@ -1,4 +1,4 @@
-# HCL Universal Orchestrator: Deployment using Docker or Podman
+# Deploying HCL Universal Orchestrator using Docker or Podman
 
 HCL Universal Orchestrator is a modern process orchestration solution designed for deployment via container platforms across public or private cloud environments. A container-based deployment using Docker or Podman ensures a fast and efficient way to launch your environment quickly. It simplifies maintenance, lowers deployment complexity, minimizes IT requirements, and you can quickly set up self-contained orchestration environments. 
 The uno-all-in-one-compose package provides the UnO core and optional services. It is designed for environments where you want to manage your prerequisite services independently. To respond to the growing request to make automation opportunities more accessible, HCL Universal Orchestrator containers can be deployed using the following 
@@ -47,6 +47,10 @@ The compressed file contains the following files, scripts, and folder:
 Before you begin verify that your environment meets the following requirements. Configure the connection details for these services in the `main.env` file.
 
 * Podman: Version 5 or later.
+* Docker: Installing Docker by using APT is recommended for deployment. If you use Docker installed by using snap, extract the Docker Compose zip files to a user system directory (for example, `/home/ or /home/<username>/`) to avoid permission issues caused by snap confinement.
+* Linux distributions
+	- Ubuntu 22.04+
+	- RHEL 8+
 * Messaging system : Apache Kafka v 3.9 or later OR Redpanda v 25.3 or later. For more information, see [Kafka documentation](https://kafka.apache.org/43/getting-started/) or [Redpanda](https://docs.redpanda.com/agentic-data-plane/home/).
 * Database : MongoDB v 8 or later OR Azure DocumentDB (formerly known as Azure Cosmos DB for MongoDB vCore) OR AWS DocumentDB v 5 
 	(Note: Support for the DocumentDB platform is strictly limited to Instance-based clusters only). For more information, see [MongoDB documentation](https://www.mongodb.com/docs/) or [Azure Cosmos DB documentation](https://learn.microsoft.com/en-us/azure/cosmos-db/) or [AWS documentation](https://docs.aws.amazon.com/documentdb/).
@@ -62,6 +66,17 @@ Before you begin verify that your environment meets the following requirements. 
 	- Agentic Builder TLS, if used (`security/agenticbuilder/`)
 
 	Then add these certificate files to the **security** folder.
+* Registry Certificates: Download the required SSL/TLS certificate from the container registry, and save it to the `cert` directory in your home directory before you run the installation.
+* Hardware requirements
+
+| Hardware resource | HCL Universal Orchestrator | Additional: Agentic AI builder | Additional: AI pilot |
+| :---: | :---: | :---: | :---: |
+| RAM | 16 GB | 4 GB | 6 GB |
+| CPU | 4 cores | 2 cores | 2 cores |
+| Disk space | 50 GB | 18 GB | 2 GB |
+
+These values represent the minimum system requirements. You can tune the resource limits in Docker compose based on your specific requirements.
+
 	
 
 ## Services overview
@@ -226,6 +241,12 @@ docker compose --env-file main.env --profile full -f docker-compose.yml up -d
 ```
 podman compose --env-file main.env --profile full -f docker-compose.yml up -d
 ```
+
+8. Download and configure the HCL UnO agent. For more information, see [Installing HCL UnO agent](https://help.hcl-software.com/UnO/ContinuousDelivery/Configuring/t_configuring_orchestrationagent.html).
+
+**Note:** To download and configure Orchestration CLI, see [Installing and authenticating the Orchestration CLI](https://help.hcl-software.com/UnO/ContinuousDelivery/Deployment/installingocli.html).
+
+
 ### Optional: Deploying in an air-gapped environment
 
 To deploy the HCL Universal Orchestrator instance in an air-gapped environment, you can download the images into a portable archive and load them into a local container registry. After you log in to the HCL public registry, complete the following steps:
